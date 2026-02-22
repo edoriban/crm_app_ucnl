@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+{% block title %}Cotización {{ cot.id }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <a href="{{ url_for('cotizaciones_lista') }}"
+       class="text-muted text-decoration-none small">
+      <i class="bi bi-arrow-left"></i> Cotizaciones
+    </a>
+    <h2 class="fw-bold mb-0 mt-1">Cotización <span class="font-monospace">{{ cot.id }}</span></h2>
+    <span class="text-muted">{{ cot.nombre_cliente }} — {{ cot.empresa }}</span>
+  </div>
+  <span class="badge bg-{{ cot.get_badge_estado() }} fs-6">
+    {{ cot.get_etiqueta_estado() }}
+  </span>
+</div>
+
+<div class="row g-4">
+
+  <!-- ── Ítems de la cotización ─────────────────────────────────── -->
+  <div class="col-md-8">
+    <div class="card mb-4">
+      <div class="card-header bg-white fw-semibold">
+        <i class="bi bi-list-check text-success"></i> Servicios cotizados
+      </div>
+      <div class="card-body p-0">
+        <table class="table mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Servicio</th>
+              <th class="text-center">Cant.</th>
+              <th class="text-end">P. Unit.</th>
+              <th class="text-center">Desc.</th>
+              <th class="text-end">Subtotal</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in cot.items %}
+            <tr>
+              <td>{{ item.nombre }}</td>
+              <td class="text-center">{{ item.cantidad }}</td>
+              <td class="text-end">${{ "%.2f"|format(item.precio_unitario) }}</td>
+              <td class="text-center text-warning">
+                {% if item.descuento > 0 %}−{{ item.descuento|int }}%{% else %}—{% endif %}
+              </td>
+              <td class="text-end fw-semibold">${{ "%.2f"|format(item.subtotal_neto()) }}</td>
+            </tr>
+            {% else %}
+            <tr>
+              <td colspan="5" class="text-center text-muted py-3">
+                Sin servicios. Agrega uno desde el catálogo.
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+          {% if cot.items %}
+          <tfoot class="table-light">
+            <tr>
+              <td colspan="4" class="text-end fw-semibold">Subtotal:</td>
+              <td class="text-end">${{ "%.2f"|format(cot.subtotal()) }}</td>
+            </tr>
+            <tr>
+              <td colspan="4" class="text-end text-muted">IVA ({{ cot.iva_porcentaje|int }}%):</td>
+              <td class="text-end text-muted">${{ "%.2f"|format(cot.iva()) }}</td>
+            </tr>
+            <tr>
+              <td colspan="4" class="text-end fw-bold fs-5">TOTAL:</td>
+              <td class="text-end fw-bold text-success fs-5">${{ "%.2f"|format(cot.total()) }} MXN</td>
+            </tr>
+          </tfoot>
+          {% endif %}
+        </table>
+      </div>
+    </div>
+
+    <!-- ── Agregar servicio ─────────────────────────────────────── -->
+    {% if cot.esta_activa() %}
+    <div class="card">
+      <div class="card-header bg-white fw-semibold">
+        <i class="bi bi-plus-circle text-primary"></i> Agregar Servicio
+      </div>
+      <div class="card-body">
+        <form method="post" action="{{ url_for('cotizaciones_agregar_item', cot_id=cot.id) }}">
+          <div class="row g-2 align-items-end">
+            <div class="col-md-5">
+              <label class="form-label small fw-semibold">Servicio</label>
+              <select name="producto_id" class="form-select form-select-sm" required>
+                <option value="">— Selecciona —</option>
+                {% for prod in productos %}
+                <option value="{{ prod.id }}">
+                  {{ prod.nombre }} (${{ "%.0f"|format(prod.precio_base) }} / {{ prod.unidad }})
+                </option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-2">
+              <label class="form-label small fw-semibold">Cantidad</label>
+              <input type="number" name="cantidad" class="form-control form-control-sm"
+                     value="1" min="1" required>
+            </div>
+            <div class="col-md-2">
+              <label class="form-label small fw-semibold">Descuento %</label>
+              <input type="number" name="descuento" class="form-control form-control-sm"
+                     value="0" min="0" max="100" step="1">
+            </div>
+            <div class="col-md-3">
+              <button type="submit" class="btn btn-sm btn-primary w-100">
+                <i class="bi bi-plus-lg"></i> Agregar
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- ── Panel lateral ────────────────────────────────────────── -->
+  <div class="col-md-4">
+
+    <!-- Info de la cotización -->
+    <div class="card mb-3">
+      <div class="card-header bg-white fw-semibold">
+        <i class="bi bi-info-circle text-primary"></i> Datos
+      </div>
+      <div class="card-body">
+        <dl class="row mb-0 small">
+          <dt class="col-5 text-muted">ID</dt>
+          <dd class="col-7 font-monospace">{{ cot.id }}</dd>
+
+          <dt class="col-5 text-muted">Lead</dt>
+          <dd class="col-7">
+            {% if lead %}
+            <a href="{{ url_for('leads_detalle', lead_id=lead.id) }}">
+              {{ lead.nombre }}
+            </a>
+            {% else %}{{ cot.lead_id }}{% endif %}
+          </dd>
+
+          <dt class="col-5 text-muted">Creada</dt>
+          <dd class="col-7">{{ cot.fecha_creacion[:10] }}</dd>
+
+          {% if cot.fecha_vigencia %}
+          <dt class="col-5 text-muted">Vigente hasta</dt>
+          <dd class="col-7">{{ cot.fecha_vigencia }}</dd>
+          {% endif %}
+
+          {% if cot.notas %}
+          <dt class="col-5 text-muted">Notas</dt>
+          <dd class="col-7">{{ cot.notas }}</dd>
+          {% endif %}
+        </dl>
+      </div>
+    </div>
+
+    <!-- Cambiar estado -->
+    <div class="card mb-3">
+      <div class="card-header bg-white fw-semibold">
+        <i class="bi bi-arrow-repeat text-warning"></i> Cambiar Estado
+      </div>
+      <div class="card-body">
+        <form method="post"
+              action="{{ url_for('cotizaciones_cambiar_estado', cot_id=cot.id) }}">
+          <select name="estado" class="form-select form-select-sm mb-2">
+            {% for estado in estados %}
+            <option value="{{ estado }}"
+              {% if estado == cot.estado %}selected{% endif %}>
+              {{ etiquetas_estado[estado] }}
+            </option>
+            {% endfor %}
+          </select>
+          <button type="submit" class="btn btn-warning btn-sm w-100">
+            <i class="bi bi-check2"></i> Actualizar
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Eliminar cotización -->
+    <div class="card border-danger">
+      <div class="card-body text-center">
+        <form method="post"
+              action="{{ url_for('cotizaciones_eliminar', cot_id=cot.id) }}"
+              onsubmit="return confirm('¿Eliminar esta cotización?')">
+          <button type="submit" class="btn btn-outline-danger btn-sm w-100">
+            <i class="bi bi-trash"></i> Eliminar Cotización
+          </button>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

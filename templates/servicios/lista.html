@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Catálogo de Servicios{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2 class="fw-bold mb-0">
+    <i class="bi bi-grid-fill text-primary"></i> Catálogo de Servicios
+  </h2>
+  <a href="{{ url_for('servicios_nuevo') }}" class="btn btn-primary">
+    <i class="bi bi-plus-lg"></i> Nuevo Servicio
+  </a>
+</div>
+
+<div class="row row-cols-1 row-cols-md-3 g-4">
+  {% for prod in productos %}
+  <div class="col">
+    <div class="card h-100 {% if not prod.activo %}opacity-50{% endif %}">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <h5 class="card-title mb-0">{{ prod.nombre }}</h5>
+          <span class="badge bg-secondary">{{ prod.get_etiqueta_categoria() }}</span>
+        </div>
+        <p class="card-text text-muted small">{{ prod.descripcion or 'Sin descripción.' }}</p>
+        <div class="fw-bold text-success">{{ prod.get_precio_formateado() }}</div>
+      </div>
+      <div class="card-footer bg-white d-flex justify-content-between align-items-center">
+        <span class="badge {% if prod.activo %}bg-success{% else %}bg-secondary{% endif %}">
+          {% if prod.activo %}Activo{% else %}Inactivo{% endif %}
+        </span>
+        <form method="post"
+              action="{{ url_for('servicios_toggle', producto_id=prod.id) }}">
+          <button type="submit"
+                  class="btn btn-sm {% if prod.activo %}btn-outline-warning{% else %}btn-outline-success{% endif %}">
+            <i class="bi {% if prod.activo %}bi-pause-circle{% else %}bi-play-circle{% endif %}"></i>
+            {% if prod.activo %}Desactivar{% else %}Activar{% endif %}
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <div class="col-12">
+    <p class="text-muted text-center py-5">
+      No hay servicios en el catálogo.
+      <a href="{{ url_for('servicios_nuevo') }}">Añadir el primero</a>.
+    </p>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Nuevo Servicio{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+  <a href="{{ url_for('servicios_lista') }}" class="text-muted text-decoration-none small">
+    <i class="bi bi-arrow-left"></i> Catálogo
+  </a>
+  <h2 class="fw-bold mb-0 mt-1">
+    <i class="bi bi-plus-circle text-primary"></i> Nuevo Servicio
+  </h2>
+</div>
+
+<div class="card" style="max-width:600px">
+  <div class="card-body">
+    <form method="post">
+      <div class="row g-3">
+
+        <div class="col-12">
+          <label class="form-label fw-semibold">Nombre del servicio <span class="text-danger">*</span></label>
+          <input type="text" name="nombre" class="form-control" required
+                 placeholder="Ej. Desarrollo de Aplicación Web a Medida">
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">Categoría</label>
+          <select name="categoria" class="form-select">
+            {% for cat in categorias %}
+            <option value="{{ cat }}">{{ etiquetas_categoria[cat] }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label fw-semibold">Precio base (MXN)</label>
+          <input type="number" name="precio_base" class="form-control"
+                 min="0" step="100" value="0" required>
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label fw-semibold">Unidad</label>
+          <select name="unidad" class="form-select">
+            {% for u in unidades %}
+            <option value="{{ u }}">{{ u }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="col-12">
+          <label class="form-label fw-semibold">Descripción</label>
+          <textarea name="descripcion" class="form-control" rows="3"
+                    placeholder="Describe el alcance y entregables del servicio…"></textarea>
+        </div>
+
+        <div class="col-12 d-flex gap-2 mt-2">
+          <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-lg"></i> Crear Servicio
+          </button>
+          <a href="{{ url_for('servicios_lista') }}" class="btn btn-outline-secondary">
+            Cancelar
+          </a>
+        </div>
+
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

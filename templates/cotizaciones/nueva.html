@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Nueva Cotización{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+  <a href="{{ url_for('leads_detalle', lead_id=lead.id) }}"
+     class="text-muted text-decoration-none small">
+    <i class="bi bi-arrow-left"></i> {{ lead.nombre }}
+  </a>
+  <h2 class="fw-bold mb-0 mt-1">
+    <i class="bi bi-file-earmark-plus text-success"></i> Nueva Cotización
+  </h2>
+  <p class="text-muted mb-0">Para: <strong>{{ lead.nombre }}</strong> — {{ lead.empresa }}</p>
+</div>
+
+<div class="card" style="max-width:600px">
+  <div class="card-body">
+    <form method="post">
+      <div class="row g-3">
+
+        <div class="col-12">
+          <label class="form-label fw-semibold">Fecha de vigencia</label>
+          <input type="date" name="fecha_vigencia" class="form-control">
+          <div class="form-text">Hasta cuándo es válida esta cotización.</div>
+        </div>
+
+        <div class="col-12">
+          <label class="form-label fw-semibold">Notas / Condiciones especiales</label>
+          <textarea name="notas" class="form-control" rows="3"
+                    placeholder="Condiciones de pago, garantías, alcance…"></textarea>
+        </div>
+
+        <div class="col-12 d-flex gap-2 mt-2">
+          <button type="submit" class="btn btn-success">
+            <i class="bi bi-check-lg"></i> Crear Cotización
+          </button>
+          <a href="{{ url_for('leads_detalle', lead_id=lead.id) }}"
+             class="btn btn-outline-secondary">
+            Cancelar
+          </a>
+        </div>
+
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

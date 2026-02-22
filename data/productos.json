@@ -1,0 +1,74 @@
+[
+  {
+    "id": "P001",
+    "nombre": "Desarrollo de Aplicación Web a Medida",
+    "categoria": "desarrollo_web",
+    "descripcion": "Diseño, desarrollo y despliegue de una aplicación web full-stack con panel de administración, autenticación y base de datos relacional.",
+    "precio_base": 45000.00,
+    "unidad": "proyecto",
+    "activo": true
+  },
+  {
+    "id": "P002",
+    "nombre": "Mantenimiento y Soporte Mensual",
+    "categoria": "soporte",
+    "descripcion": "Soporte técnico preventivo y correctivo, actualizaciones de seguridad, monitoreo de servidores y respaldo de datos.",
+    "precio_base": 4500.00,
+    "unidad": "mes",
+    "activo": true
+  },
+  {
+    "id": "P003",
+    "nombre": "Aplicación Móvil (iOS + Android)",
+    "categoria": "desarrollo_movil",
+    "descripcion": "Desarrollo de aplicación móvil multiplataforma con React Native, integración con API REST y publicación en tiendas.",
+    "precio_base": 70000.00,
+    "unidad": "proyecto",
+    "activo": true
+  },
+  {
+    "id": "P004",
+    "nombre": "Consultoría en Transformación Digital",
+    "categoria": "consultoria",
+    "descripcion": "Diagnóstico de procesos, definición de hoja de ruta tecnológica y acompañamiento en la adopción de herramientas digitales.",
+    "precio_base": 2500.00,
+    "unidad": "hora",
+    "activo": true
+  },
+  {
+    "id": "P005",
+    "nombre": "Migración a la Nube (AWS / Azure)",
+    "categoria": "infraestructura",
+    "descripcion": "Análisis de infraestructura actual, planificación y ejecución de migración a servicios en la nube con alta disponibilidad.",
+    "precio_base": 35000.00,
+    "unidad": "proyecto",
+    "activo": true
+  },
+  {
+    "id": "P006",
+    "nombre": "Integración de Sistemas / API",
+    "categoria": "integracion",
+    "descripcion": "Diseño e implementación de integraciones entre sistemas ERP, CRM, plataformas de pago y servicios externos vía API REST/SOAP.",
+    "precio_base": 18000.00,
+    "unidad": "proyecto",
+    "activo": true
+  },
+  {
+    "id": "P007",
+    "nombre": "Dashboard de Analítica de Datos",
+    "categoria": "analisis_datos",
+    "descripcion": "Diseño y desarrollo de tableros interactivos con KPIs del negocio, conexión a fuentes de datos y reportes automatizados.",
+    "precio_base": 28000.00,
+    "unidad": "proyecto",
+    "activo": true
+  },
+  {
+    "id": "P008",
+    "nombre": "Licencia de Software Propio (anual)",
+    "categoria": "otro",
+    "descripcion": "Licencia anual de uso del sistema de gestión desarrollado por VanDev, incluye actualizaciones y soporte básico.",
+    "precio_base": 12000.00,
+    "unidad": "licencia",
+    "activo": true
+  }
+]

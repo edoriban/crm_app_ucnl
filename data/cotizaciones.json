@@ -1,0 +1,56 @@
+[
+  {
+    "id": "C001",
+    "lead_id": "L001",
+    "nombre_cliente": "Carlos Mendoza",
+    "empresa": "Distribuidora Norte S.A.",
+    "items": [
+      {
+        "producto_id": "P001",
+        "nombre": "Desarrollo de Aplicación Web a Medida",
+        "cantidad": 1,
+        "precio_unitario": 45000.00,
+        "descuento": 10.0
+      },
+      {
+        "producto_id": "P002",
+        "nombre": "Mantenimiento y Soporte Mensual",
+        "cantidad": 3,
+        "precio_unitario": 4500.00,
+        "descuento": 0.0
+      }
+    ],
+    "estado": "enviada",
+    "fecha_creacion": "2024-10-10T10:00:00",
+    "fecha_vigencia": "2024-11-10",
+    "notas": "Propuesta incluye 3 meses de soporte post-implementación.",
+    "iva_porcentaje": 16.0
+  },
+  {
+    "id": "C002",
+    "lead_id": "L004",
+    "nombre_cliente": "Gabriela Torres",
+    "empresa": "StartUp Fintech GDL",
+    "items": [
+      {
+        "producto_id": "P003",
+        "nombre": "Aplicación Móvil (iOS + Android)",
+        "cantidad": 1,
+        "precio_unitario": 70000.00,
+        "descuento": 5.0
+      },
+      {
+        "producto_id": "P002",
+        "nombre": "Mantenimiento y Soporte Mensual",
+        "cantidad": 6,
+        "precio_unitario": 4500.00,
+        "descuento": 0.0
+      }
+    ],
+    "estado": "aceptada",
+    "fecha_creacion": "2024-09-25T09:00:00",
+    "fecha_vigencia": "2024-10-25",
+    "notas": "Contrato firmado el 2024-09-30. Inicio de proyecto: 2024-10-07.",
+    "iva_porcentaje": 16.0
+  }
+]

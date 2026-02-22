@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2 class="fw-bold mb-0"><i class="bi bi-speedometer2 text-primary"></i> Dashboard</h2>
+  <a href="{{ url_for('leads_nuevo') }}" class="btn btn-primary">
+    <i class="bi bi-plus-lg"></i> Nuevo Lead
+  </a>
+</div>
+
+<!-- ── Tarjetas de resumen: Leads ─────────────────────────────── -->
+<h5 class="text-muted mb-3">Estado de Leads</h5>
+<div class="row g-3 mb-4">
+
+  <div class="col-md-2">
+    <div class="card stat-card blue p-3 text-center">
+      <div class="fs-2 fw-bold text-primary">{{ resumen_leads.total }}</div>
+      <div class="small text-muted">Total Leads</div>
+    </div>
+  </div>
+
+  <div class="col-md-2">
+    <div class="card stat-card blue p-3 text-center">
+      <div class="fs-2 fw-bold text-secondary">{{ resumen_leads.nuevo }}</div>
+      <div class="small text-muted">Nuevos</div>
+    </div>
+  </div>
+
+  <div class="col-md-2">
+    <div class="card stat-card blue p-3 text-center">
+      <div class="fs-2 fw-bold" style="color:#0dcaf0">{{ resumen_leads.contactado }}</div>
+      <div class="small text-muted">Contactados</div>
+    </div>
+  </div>
+
+  <div class="col-md-2">
+    <div class="card stat-card orange p-3 text-center">
+      <div class="fs-2 fw-bold text-warning">{{ resumen_leads.propuesta }}</div>
+      <div class="small text-muted">Propuesta</div>
+    </div>
+  </div>
+
+  <div class="col-md-2">
+    <div class="card stat-card green p-3 text-center">
+      <div class="fs-2 fw-bold text-success">{{ resumen_leads.cerrado_ganado }}</div>
+      <div class="small text-muted">Ganados</div>
+    </div>
+  </div>
+
+  <div class="col-md-2">
+    <div class="card stat-card red p-3 text-center">
+      <div class="fs-2 fw-bold text-danger">{{ resumen_leads.cerrado_perdido }}</div>
+      <div class="small text-muted">Perdidos</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── Tarjetas de resumen: Cotizaciones ──────────────────────── -->
+<h5 class="text-muted mb-3">Estado de Cotizaciones</h5>
+<div class="row g-3 mb-4">
+
+  <div class="col-md-2">
+    <div class="card p-3 text-center">
+      <div class="fs-2 fw-bold text-primary">{{ resumen_cots.total }}</div>
+      <div class="small text-muted">Total Cots.</div>
+    </div>
+  </div>
+
+  <div class="col-md-2">
+    <div class="card p-3 text-center">
+      <div class="fs-2 fw-bold text-secondary">{{ resumen_cots.borrador }}</div>
+      <div class="small text-muted">Borradores</div>
+    </div>
+  </div>
+
+  <div class="col-md-2">
+    <div class="card p-3 text-center">
+      <div class="fs-2 fw-bold" style="color:#0dcaf0">{{ resumen_cots.enviada }}</div>
+      <div class="small text-muted">Enviadas</div>
+    </div>
+  </div>
+
+  <div class="col-md-2">
+    <div class="card stat-card green p-3 text-center">
+      <div class="fs-2 fw-bold text-success">{{ resumen_cots.aceptada }}</div>
+      <div class="small text-muted">Aceptadas</div>
+    </div>
+  </div>
+
+  <div class="col-md-2">
+    <div class="card stat-card red p-3 text-center">
+      <div class="fs-2 fw-bold text-danger">{{ resumen_cots.rechazada }}</div>
+      <div class="small text-muted">Rechazadas</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── Leads recientes ────────────────────────────────────────── -->
+<div class="card mt-2">
+  <div class="card-header bg-white fw-semibold d-flex justify-content-between">
+    <span><i class="bi bi-clock-history text-primary"></i> Leads Recientes</span>
+    <a href="{{ url_for('leads_lista') }}" class="btn btn-sm btn-outline-primary">
+      Ver todos
+    </a>
+  </div>
+  <div class="card-body p-0">
+    <table class="table table-hover mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>Nombre</th>
+          <th>Empresa</th>
+          <th>Servicio de interés</th>
+          <th>Estado</th>
+          <th>Fecha</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for lead in leads_recientes %}
+        <tr>
+          <td>{{ lead.nombre }}</td>
+          <td>{{ lead.empresa }}</td>
+          <td>{{ lead.servicio_interes }}</td>
+          <td>
+            <span class="badge bg-{{ lead.get_badge_estado() }}">
+              {{ lead.get_etiqueta_estado() }}
+            </span>
+          </td>
+          <td class="text-muted small">{{ lead.fecha_creacion[:10] }}</td>
+          <td>
+            <a href="{{ url_for('leads_detalle', lead_id=lead.id) }}"
+               class="btn btn-sm btn-outline-secondary">
+              <i class="bi bi-eye"></i>
+            </a>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="6" class="text-center text-muted py-3">
+            No hay leads todavía.
+            <a href="{{ url_for('leads_nuevo') }}">Crear el primero</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
