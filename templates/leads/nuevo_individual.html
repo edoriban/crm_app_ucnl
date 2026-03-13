@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block title %}Nuevo Lead Individual{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+  <a href="{{ url_for('leads_nuevo') }}" class="text-muted text-decoration-none small">
+    <i class="bi bi-arrow-left"></i> Seleccionar tipo
+  </a>
+  <h2 class="fw-bold mb-0 mt-1">
+    <i class="bi bi-person text-success"></i> Nuevo Lead Individual
+  </h2>
+  <small class="text-muted">Clase <code>LeadIndividual</code> — hereda de <code>Lead</code></small>
+</div>
+
+<div class="card" style="max-width:720px">
+  <div class="card-body">
+    <form method="post">
+
+      <!-- ── Campos heredados de Lead (clase base) ── -->
+      <h6 class="fw-bold text-success border-bottom pb-2 mb-3">
+        <i class="bi bi-box-arrow-in-down-right"></i> Datos base (heredados de Lead)
+      </h6>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">Nombre completo <span class="text-danger">*</span></label>
+          <input type="text" name="nombre" class="form-control" required
+                 placeholder="Ej. Ana Torres López">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">Empresa / Negocio</label>
+          <input type="text" name="empresa" class="form-control"
+                 placeholder="Ej. Freelance (opcional)">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">Email <span class="text-danger">*</span></label>
+          <input type="email" name="email" class="form-control" required
+                 placeholder="persona@correo.com">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">Teléfono</label>
+          <input type="tel" name="telefono" class="form-control"
+                 placeholder="Ej. +52 81 9876 5432">
+        </div>
+        <div class="col-12">
+          <label class="form-label fw-semibold">Servicio de interés</label>
+          <input type="text" name="servicio_interes" class="form-control"
+                 list="servicios_list" placeholder="Selecciona o escribe…">
+          <datalist id="servicios_list">
+            {% for s in servicios %}
+            <option value="{{ s }}">
+            {% endfor %}
+          </datalist>
+        </div>
+        <div class="col-12">
+          <label class="form-label fw-semibold">Notas</label>
+          <textarea name="notas" class="form-control" rows="2"
+                    placeholder="Información adicional…"></textarea>
+        </div>
+      </div>
+
+      <!-- ── Campos propios de LeadIndividual (subclase) ── -->
+      <h6 class="fw-bold text-success border-bottom pb-2 mb-3 mt-4">
+        <i class="bi bi-person"></i> Datos individuales (propios de la subclase)
+      </h6>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">Ocupación</label>
+          <select name="ocupacion" class="form-select">
+            {% for o in ocupaciones %}
+            <option value="{{ o }}">{{ etiquetas_ocupacion[o] }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">Referido por</label>
+          <input type="text" name="referido_por" class="form-control"
+                 placeholder="Ej. Juan Pérez (opcional)">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">Presupuesto estimado (MXN)</label>
+          <div class="input-group">
+            <span class="input-group-text">$</span>
+            <input type="number" name="presupuesto_estimado" class="form-control"
+                   min="0" step="0.01" value="0" placeholder="Ej. 25000">
+          </div>
+        </div>
+        <div class="col-md-6 d-flex align-items-end">
+          <div class="form-check">
+            <input type="checkbox" name="es_freelancer" class="form-check-input" id="chkFreelancer">
+            <label class="form-check-label fw-semibold" for="chkFreelancer">
+              ¿Es freelancer?
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="d-flex gap-2 mt-4">
+        <button type="submit" class="btn btn-success">
+          <i class="bi bi-check-lg"></i> Crear Lead Individual
+        </button>
+        <a href="{{ url_for('leads_nuevo') }}" class="btn btn-outline-secondary">
+          Cancelar
+        </a>
+      </div>
+
+    </form>
+  </div>
+</div>
+{% endblock %}

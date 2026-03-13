@@ -7,8 +7,38 @@ import uuid
 from datetime import datetime
 
 from .lead import Lead
+from .lead_empresarial import LeadEmpresarial
+from .lead_individual import LeadIndividual
 from .cotizacion import Cotizacion, ItemCotizacion
 from .producto import Producto
+
+
+# ──────────────────────────────────────────────────────────────────
+# Factory para polimorfismo al cargar leads desde JSON
+# ──────────────────────────────────────────────────────────────────
+
+def _lead_from_dict(data: dict) -> Lead:
+    """
+    Factory que reconstruye la subclase correcta de Lead según el
+    campo 'tipo' almacenado en el diccionario JSON.
+
+    Demuestra polimorfismo: el sistema trata cada lead como un
+    objeto Lead, pero internamente puede ser LeadEmpresarial,
+    LeadIndividual o Lead base, y cada uno responde de forma
+    diferente a métodos como __str__() y to_dict().
+
+    Args:
+        data: Diccionario con los datos del lead (incluye campo 'tipo').
+
+    Returns:
+        Instancia de Lead, LeadEmpresarial o LeadIndividual.
+    """
+    tipo = data.get("tipo", "general")
+    if tipo == "empresarial":
+        return LeadEmpresarial.from_dict(data)
+    elif tipo == "individual":
+        return LeadIndividual.from_dict(data)
+    return Lead.from_dict(data)
 
 
 # ──────────────────────────────────────────────────────────────────
@@ -43,7 +73,7 @@ class GestorLeads:
         if os.path.exists(self.archivo_json):
             with open(self.archivo_json, "r", encoding="utf-8") as f:
                 datos = json.load(f)
-            self.leads = {d["id"]: Lead.from_dict(d) for d in datos}
+            self.leads = {d["id"]: _lead_from_dict(d) for d in datos}
 
     def guardar(self) -> None:
         """Persiste todos los leads en el archivo JSON."""
@@ -85,6 +115,56 @@ class GestorLeads:
         self.guardar()
         return lead
 
+    def crear_empresarial(self, nombre: str, empresa: str, email: str,
+                          telefono: str, servicio_interes: str,
+                          rfc: str = "", num_empleados: int = 0,
+                          presupuesto_anual: float = 0.0,
+                          sector: str = "otro",
+                          notas: str = "") -> LeadEmpresarial:
+        """
+        Crea un nuevo lead empresarial (subclase de Lead) y lo persiste.
+
+        Returns:
+            El LeadEmpresarial recién creado.
+        """
+        nuevo_id = f"LE{uuid.uuid4().hex[:5].upper()}"
+        lead = LeadEmpresarial(
+            id=nuevo_id, nombre=nombre, empresa=empresa,
+            email=email, telefono=telefono,
+            servicio_interes=servicio_interes,
+            rfc=rfc, num_empleados=num_empleados,
+            presupuesto_anual=presupuesto_anual,
+            sector=sector, notas=notas,
+        )
+        self.leads[nuevo_id] = lead
+        self.guardar()
+        return lead
+
+    def crear_individual(self, nombre: str, empresa: str, email: str,
+                         telefono: str, servicio_interes: str,
+                         ocupacion: str = "otro", referido_por: str = "",
+                         presupuesto_estimado: float = 0.0,
+                         es_freelancer: bool = False,
+                         notas: str = "") -> LeadIndividual:
+        """
+        Crea un nuevo lead individual (subclase de Lead) y lo persiste.
+
+        Returns:
+            El LeadIndividual recién creado.
+        """
+        nuevo_id = f"LI{uuid.uuid4().hex[:5].upper()}"
+        lead = LeadIndividual(
+            id=nuevo_id, nombre=nombre, empresa=empresa,
+            email=email, telefono=telefono,
+            servicio_interes=servicio_interes,
+            ocupacion=ocupacion, referido_por=referido_por,
+            presupuesto_estimado=presupuesto_estimado,
+            es_freelancer=es_freelancer, notas=notas,
+        )
+        self.leads[nuevo_id] = lead
+        self.guardar()
+        return lead
+
     def obtener(self, lead_id: str) -> Lead | None:
         """Retorna el Lead con el id dado, o None si no existe."""
         return self.leads.get(lead_id)
@@ -116,7 +196,12 @@ class GestorLeads:
         if not lead:
             return False
         campos_validos = {"nombre", "empresa", "email", "telefono",
-                          "servicio_interes", "notas"}
+                          "servicio_interes", "notas",
+                          # Campos de LeadEmpresarial
+                          "rfc", "num_empleados", "presupuesto_anual", "sector",
+                          # Campos de LeadIndividual
+                          "ocupacion", "referido_por", "presupuesto_estimado",
+                          "es_freelancer"}
         for campo, valor in campos.items():
             if campo in campos_validos:
                 setattr(lead, campo, valor)

@@ -3,7 +3,8 @@
 # Empresa: Servicios Tecnológicos / Software
 
 from flask import Flask, render_template, request, redirect, url_for, flash
-from models import GestorLeads, GestorCotizaciones, GestorProductos
+from models import (GestorLeads, GestorCotizaciones, GestorProductos,
+                    Lead, LeadEmpresarial, LeadIndividual)
 from models.cotizacion import ItemCotizacion
 import os
 
@@ -46,8 +47,6 @@ def leads_lista():
     """Lista todos los leads con filtro opcional por estado."""
     estado_filtro = request.args.get("estado", "")
     busqueda      = request.args.get("q", "")
-    from models.lead import Lead as LeadModel
-
     if busqueda:
         leads = gestor_leads.buscar(busqueda)
     elif estado_filtro:
@@ -58,16 +57,20 @@ def leads_lista():
     return render_template(
         "leads/lista.html",
         leads=leads,
-        estados=LeadModel.ESTADOS,
-        etiquetas_estado=LeadModel.ETIQUETAS_ESTADO,
+        estados=Lead.ESTADOS,
+        etiquetas_estado=Lead.ETIQUETAS_ESTADO,
         estado_filtro=estado_filtro,
         busqueda=busqueda,
     )
 
-@app.route("/leads/nuevo", methods=["GET", "POST"])
+@app.route("/leads/nuevo")
 def leads_nuevo():
-    """Formulario y acción para crear un nuevo lead."""
-    from models.producto import Producto
+    """Página de selección de tipo de lead a crear."""
+    return render_template("leads/nuevo.html")
+
+@app.route("/leads/nuevo/empresarial", methods=["GET", "POST"])
+def leads_nuevo_empresarial():
+    """Formulario y acción para crear un lead empresarial (herencia)."""
     servicios = [p.nombre for p in gestor_productos.listar()]
 
     if request.method == "POST":
@@ -77,22 +80,68 @@ def leads_nuevo():
         telefono         = request.form.get("telefono", "").strip()
         servicio_interes = request.form.get("servicio_interes", "").strip()
         notas            = request.form.get("notas", "").strip()
+        # Campos específicos de la subclase LeadEmpresarial
+        rfc              = request.form.get("rfc", "").strip()
+        num_empleados    = int(request.form.get("num_empleados", 0))
+        presupuesto_anual = float(request.form.get("presupuesto_anual", 0))
+        sector           = request.form.get("sector", "otro")
 
         if not nombre or not email:
             flash("Nombre y email son campos obligatorios.", "danger")
         else:
-            lead = gestor_leads.crear(
-                nombre=nombre,
-                empresa=empresa,
-                email=email,
-                telefono=telefono,
-                servicio_interes=servicio_interes,
-                notas=notas,
+            lead = gestor_leads.crear_empresarial(
+                nombre=nombre, empresa=empresa, email=email,
+                telefono=telefono, servicio_interes=servicio_interes,
+                notas=notas, rfc=rfc, num_empleados=num_empleados,
+                presupuesto_anual=presupuesto_anual, sector=sector,
             )
-            flash(f"Lead '{lead.nombre}' creado correctamente.", "success")
+            flash(f"Lead empresarial '{lead.nombre}' creado correctamente.", "success")
             return redirect(url_for("leads_detalle", lead_id=lead.id))
 
-    return render_template("leads/nuevo.html", servicios=servicios)
+    return render_template(
+        "leads/nuevo_empresarial.html",
+        servicios=servicios,
+        sectores=LeadEmpresarial.SECTORES,
+        etiquetas_sector=LeadEmpresarial.ETIQUETAS_SECTOR,
+    )
+
+@app.route("/leads/nuevo/individual", methods=["GET", "POST"])
+def leads_nuevo_individual():
+    """Formulario y acción para crear un lead individual (herencia)."""
+    servicios = [p.nombre for p in gestor_productos.listar()]
+
+    if request.method == "POST":
+        nombre           = request.form.get("nombre", "").strip()
+        empresa          = request.form.get("empresa", "").strip()
+        email            = request.form.get("email", "").strip()
+        telefono         = request.form.get("telefono", "").strip()
+        servicio_interes = request.form.get("servicio_interes", "").strip()
+        notas            = request.form.get("notas", "").strip()
+        # Campos específicos de la subclase LeadIndividual
+        ocupacion            = request.form.get("ocupacion", "otro")
+        referido_por         = request.form.get("referido_por", "").strip()
+        presupuesto_estimado = float(request.form.get("presupuesto_estimado", 0))
+        es_freelancer        = request.form.get("es_freelancer") == "on"
+
+        if not nombre or not email:
+            flash("Nombre y email son campos obligatorios.", "danger")
+        else:
+            lead = gestor_leads.crear_individual(
+                nombre=nombre, empresa=empresa, email=email,
+                telefono=telefono, servicio_interes=servicio_interes,
+                notas=notas, ocupacion=ocupacion, referido_por=referido_por,
+                presupuesto_estimado=presupuesto_estimado,
+                es_freelancer=es_freelancer,
+            )
+            flash(f"Lead individual '{lead.nombre}' creado correctamente.", "success")
+            return redirect(url_for("leads_detalle", lead_id=lead.id))
+
+    return render_template(
+        "leads/nuevo_individual.html",
+        servicios=servicios,
+        ocupaciones=LeadIndividual.OCUPACIONES,
+        etiquetas_ocupacion=LeadIndividual.ETIQUETAS_OCUPACION,
+    )
 
 @app.route("/leads/<lead_id>")
 def leads_detalle(lead_id):
@@ -103,13 +152,20 @@ def leads_detalle(lead_id):
         return redirect(url_for("leads_lista"))
 
     cotizaciones = gestor_cotizaciones.listar(lead_id=lead_id)
-    from models.lead import Lead as LeadModel
+    # Determinar el tipo de lead para mostrar campos específicos
+    tipo_lead = "base"
+    if isinstance(lead, LeadEmpresarial):
+        tipo_lead = "empresarial"
+    elif isinstance(lead, LeadIndividual):
+        tipo_lead = "individual"
+
     return render_template(
         "leads/detalle.html",
         lead=lead,
         cotizaciones=cotizaciones,
-        estados=LeadModel.ESTADOS,
-        etiquetas_estado=LeadModel.ETIQUETAS_ESTADO,
+        estados=Lead.ESTADOS,
+        etiquetas_estado=Lead.ETIQUETAS_ESTADO,
+        tipo_lead=tipo_lead,
     )
 
 @app.route("/leads/<lead_id>/editar", methods=["GET", "POST"])
@@ -131,11 +187,37 @@ def leads_editar(lead_id):
             "servicio_interes": request.form.get("servicio_interes", "").strip(),
             "notas":            request.form.get("notas", "").strip(),
         }
+        # Campos adicionales según el tipo de lead (polimorfismo)
+        if isinstance(lead, LeadEmpresarial):
+            campos["rfc"]               = request.form.get("rfc", "").strip()
+            campos["num_empleados"]     = int(request.form.get("num_empleados", 0))
+            campos["presupuesto_anual"] = float(request.form.get("presupuesto_anual", 0))
+            campos["sector"]            = request.form.get("sector", "otro")
+        elif isinstance(lead, LeadIndividual):
+            campos["ocupacion"]            = request.form.get("ocupacion", "otro")
+            campos["referido_por"]         = request.form.get("referido_por", "").strip()
+            campos["presupuesto_estimado"] = float(request.form.get("presupuesto_estimado", 0))
+            campos["es_freelancer"]        = request.form.get("es_freelancer") == "on"
+
         gestor_leads.actualizar(lead_id, **campos)
         flash("Lead actualizado correctamente.", "success")
         return redirect(url_for("leads_detalle", lead_id=lead_id))
 
-    return render_template("leads/editar.html", lead=lead, servicios=servicios)
+    # Determinar tipo para la vista
+    tipo_lead = "base"
+    if isinstance(lead, LeadEmpresarial):
+        tipo_lead = "empresarial"
+    elif isinstance(lead, LeadIndividual):
+        tipo_lead = "individual"
+
+    return render_template(
+        "leads/editar.html", lead=lead, servicios=servicios,
+        tipo_lead=tipo_lead,
+        sectores=LeadEmpresarial.SECTORES,
+        etiquetas_sector=LeadEmpresarial.ETIQUETAS_SECTOR,
+        ocupaciones=LeadIndividual.OCUPACIONES,
+        etiquetas_ocupacion=LeadIndividual.ETIQUETAS_OCUPACION,
+    )
 
 @app.route("/leads/<lead_id>/estado", methods=["POST"])
 def leads_cambiar_estado(lead_id):

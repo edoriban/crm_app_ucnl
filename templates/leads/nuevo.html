@@ -7,65 +7,62 @@
     <i class="bi bi-arrow-left"></i> Leads
   </a>
   <h2 class="fw-bold mb-0 mt-1"><i class="bi bi-person-plus text-primary"></i> Nuevo Lead</h2>
+  <p class="text-muted mt-1">Selecciona el tipo de lead que deseas crear.</p>
 </div>
 
-<div class="card" style="max-width:680px">
-  <div class="card-body">
-    <form method="post">
-      <div class="row g-3">
-
-        <div class="col-md-6">
-          <label class="form-label fw-semibold">Nombre del contacto <span class="text-danger">*</span></label>
-          <input type="text" name="nombre" class="form-control" required
-                 placeholder="Ej. María González">
-        </div>
-
-        <div class="col-md-6">
-          <label class="form-label fw-semibold">Empresa</label>
-          <input type="text" name="empresa" class="form-control"
-                 placeholder="Ej. Innova Tech S.A.">
-        </div>
-
-        <div class="col-md-6">
-          <label class="form-label fw-semibold">Email <span class="text-danger">*</span></label>
-          <input type="email" name="email" class="form-control" required
-                 placeholder="contacto@empresa.com">
-        </div>
-
-        <div class="col-md-6">
-          <label class="form-label fw-semibold">Teléfono</label>
-          <input type="tel" name="telefono" class="form-control"
-                 placeholder="Ej. +52 55 1234 5678">
-        </div>
-
-        <div class="col-12">
-          <label class="form-label fw-semibold">Servicio de interés</label>
-          <input type="text" name="servicio_interes" class="form-control"
-                 list="servicios_list" placeholder="Selecciona o escribe el servicio…">
-          <datalist id="servicios_list">
-            {% for s in servicios %}
-            <option value="{{ s }}">
-            {% endfor %}
-          </datalist>
-        </div>
-
-        <div class="col-12">
-          <label class="form-label fw-semibold">Notas</label>
-          <textarea name="notas" class="form-control" rows="3"
-                    placeholder="Información adicional sobre el lead…"></textarea>
-        </div>
-
-        <div class="col-12 d-flex gap-2 mt-2">
-          <button type="submit" class="btn btn-primary">
-            <i class="bi bi-check-lg"></i> Crear Lead
-          </button>
-          <a href="{{ url_for('leads_lista') }}" class="btn btn-outline-secondary">
-            Cancelar
-          </a>
-        </div>
-
+<div class="row g-4" style="max-width:800px">
+  <!-- Opción: Lead Empresarial (clase derivada) -->
+  <div class="col-md-6">
+    <div class="card h-100 border-primary">
+      <div class="card-body text-center py-5">
+        <i class="bi bi-building fs-1 text-primary"></i>
+        <h4 class="fw-bold mt-3">Lead Empresarial</h4>
+        <p class="text-muted small">
+          Para empresas y corporaciones.<br>
+          Incluye RFC, número de empleados,<br>
+          presupuesto anual y sector.
+        </p>
+        <span class="badge bg-primary mb-3">Clase: LeadEmpresarial → hereda de Lead</span>
+        <br>
+        <a href="{{ url_for('leads_nuevo_empresarial') }}" class="btn btn-primary mt-2">
+          <i class="bi bi-building"></i> Crear Empresarial
+        </a>
       </div>
-    </form>
+    </div>
+  </div>
+
+  <!-- Opción: Lead Individual (clase derivada) -->
+  <div class="col-md-6">
+    <div class="card h-100 border-success">
+      <div class="card-body text-center py-5">
+        <i class="bi bi-person fs-1 text-success"></i>
+        <h4 class="fw-bold mt-3">Lead Individual</h4>
+        <p class="text-muted small">
+          Para personas independientes o freelancers.<br>
+          Incluye ocupación, referido por,<br>
+          presupuesto estimado.
+        </p>
+        <span class="badge bg-success mb-3">Clase: LeadIndividual → hereda de Lead</span>
+        <br>
+        <a href="{{ url_for('leads_nuevo_individual') }}" class="btn btn-success mt-2">
+          <i class="bi bi-person"></i> Crear Individual
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Nota educativa sobre herencia -->
+<div class="card mt-4" style="max-width:800px">
+  <div class="card-body bg-light">
+    <h6 class="fw-bold"><i class="bi bi-info-circle text-info"></i> Herencia en POO</h6>
+    <p class="small text-muted mb-0">
+      Ambas clases (<code>LeadEmpresarial</code> y <code>LeadIndividual</code>) heredan
+      de la clase base <code>Lead</code>, compartiendo atributos como nombre, email, teléfono
+      y estado. Cada subclase agrega sus propios atributos y sobrescribe métodos como
+      <code>to_dict()</code>, <code>__str__()</code> y <code>from_dict()</code> usando
+      <code>super()</code> para reutilizar la lógica del padre.
+    </p>
   </div>
 </div>
 {% endblock %}

@@ -9,6 +9,13 @@
     </a>
     <h2 class="fw-bold mb-0 mt-1">{{ lead.nombre }}</h2>
     <span class="text-muted">{{ lead.empresa }}</span>
+    {% if tipo_lead == 'empresarial' %}
+      <span class="badge bg-primary ms-2">Empresarial</span>
+    {% elif tipo_lead == 'individual' %}
+      <span class="badge bg-success ms-2">Individual</span>
+    {% else %}
+      <span class="badge bg-secondary ms-2">General</span>
+    {% endif %}
   </div>
   <div class="d-flex gap-2">
     <a href="{{ url_for('leads_editar', lead_id=lead.id) }}" class="btn btn-outline-secondary">
@@ -22,7 +29,7 @@
 
 <div class="row g-4">
 
-  <!-- ── Info del lead ────────────────────────────────────────── -->
+  <!-- ── Info del lead (campos heredados de Lead) ──────────────── -->
   <div class="col-md-5">
     <div class="card h-100">
       <div class="card-header bg-white fw-semibold">
@@ -58,6 +65,68 @@
           <dd class="col-sm-7">{{ lead.notas }}</dd>
           {% endif %}
         </dl>
+
+        <!-- ── Campos propios de LeadEmpresarial (subclase) ── -->
+        {% if tipo_lead == 'empresarial' %}
+        <hr>
+        <h6 class="fw-bold text-primary small">
+          <i class="bi bi-building"></i> Datos Empresariales
+          <small class="text-muted">(LeadEmpresarial)</small>
+        </h6>
+        <dl class="row mb-0">
+          <dt class="col-sm-5 text-muted">RFC</dt>
+          <dd class="col-sm-7 font-monospace">{{ lead.rfc or '—' }}</dd>
+
+          <dt class="col-sm-5 text-muted">Sector</dt>
+          <dd class="col-sm-7">{{ lead.get_etiqueta_sector() }}</dd>
+
+          <dt class="col-sm-5 text-muted">Empleados</dt>
+          <dd class="col-sm-7">{{ lead.num_empleados }}</dd>
+
+          <dt class="col-sm-5 text-muted">Presupuesto anual</dt>
+          <dd class="col-sm-7 fw-bold text-success">{{ lead.get_presupuesto_formateado() }}</dd>
+
+          <dt class="col-sm-5 text-muted">Tamaño</dt>
+          <dd class="col-sm-7">{{ lead.get_clasificacion_tamano() }}</dd>
+
+          <dt class="col-sm-5 text-muted">Potencial</dt>
+          <dd class="col-sm-7">
+            <span class="badge bg-{% if lead.calcular_potencial() == 'Alto' %}success{% elif lead.calcular_potencial() == 'Medio' %}warning{% else %}secondary{% endif %}">
+              {{ lead.calcular_potencial() }}
+            </span>
+          </dd>
+        </dl>
+        {% endif %}
+
+        <!-- ── Campos propios de LeadIndividual (subclase) ── -->
+        {% if tipo_lead == 'individual' %}
+        <hr>
+        <h6 class="fw-bold text-success small">
+          <i class="bi bi-person"></i> Datos Individuales
+          <small class="text-muted">(LeadIndividual)</small>
+        </h6>
+        <dl class="row mb-0">
+          <dt class="col-sm-5 text-muted">Ocupación</dt>
+          <dd class="col-sm-7">{{ lead.get_etiqueta_ocupacion() }}</dd>
+
+          <dt class="col-sm-5 text-muted">Referido por</dt>
+          <dd class="col-sm-7">{{ lead.referido_por or '—' }}</dd>
+
+          <dt class="col-sm-5 text-muted">Presupuesto est.</dt>
+          <dd class="col-sm-7 fw-bold text-success">{{ lead.get_presupuesto_formateado() }}</dd>
+
+          <dt class="col-sm-5 text-muted">Freelancer</dt>
+          <dd class="col-sm-7">{{ 'Sí' if lead.es_freelancer else 'No' }}</dd>
+
+          <dt class="col-sm-5 text-muted">Prioridad</dt>
+          <dd class="col-sm-7">
+            <span class="badge bg-{% if lead.calcular_prioridad() == 'Alta' %}danger{% elif lead.calcular_prioridad() == 'Media' %}warning{% else %}secondary{% endif %}">
+              {{ lead.calcular_prioridad() }}
+            </span>
+          </dd>
+        </dl>
+        {% endif %}
+
       </div>
     </div>
   </div>
